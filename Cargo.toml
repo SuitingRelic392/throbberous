@@ -9,7 +9,7 @@ repository = "https://github.com/SuitingRelic392/crank"
 homepage = "https://github.com/SuitingRelic392/crank"
 documentation = "https://docs.rs/crank"
 readme = "README.md"
-keywords = ["progress-bar", "spinner", "throbber", "async", "cli", "terminal"]
+keywords = ["progress-bar", "spinner", "throbber", "async"]
 categories = ["command-line-utilities", "async-runtime", "terminal"]
 
 [dependencies]
