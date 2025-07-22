@@ -1,4 +1,4 @@
-use crank::{Bar, BarConfig, Throbber, ThrobberConfig};
+use throbberous::{Bar, BarConfig, Throbber, ThrobberConfig};
 use crossterm::style::Color;
 use std::{env, time::Duration};
 use tokio::time::sleep;
