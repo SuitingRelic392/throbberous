@@ -1,16 +1,21 @@
 [package]
 name = "throbberous"
-version = "0.1.1"
+version = "0.1.0"
 edition = "2021"
 authors = ["trucizna"]
 description = "An async-native CLI progress bar and throbber (spinner) library for Rust."
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/SuitingRelic392/crank"
-homepage = "https://github.com/SuitingRelic392/crank"
-documentation = "https://docs.rs/crank"
+repository = "https://github.com/SuitingRelic392/throbberous"
+homepage = "https://github.com/SuitingRelic392/throbberous"
+documentation = "https://docs.rs/throbberous"
 readme = "README.md"
-keywords = ["progress-bar", "spinner", "throbber", "async"]
-categories = ["command-line-utilities", "async-runtime", "terminal"]
+keywords = ["progress-bar", "spinner", "throbber", "async", "cli"]
+categories = [
+    "command-line-utilities",
+    "command-line-interface",
+    "asynchronous",
+    "development-tools",
+]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
@@ -22,7 +27,4 @@ tokio-test = "0.4"
 
 [features]
 default = []
-
-[package.metadata.docs.rs]
-all-features = true
 
