@@ -2,6 +2,8 @@
 
 An async-native CLI progress bar and throbber (spinner) library for Rust.
 
+To run: either cargo run --example progress_and_spinner or cargo run --example progress_and_spinner --  --throbber  
+
 ## Features
 
 - Async-friendly progress bars and spinners (throbbers)
