@@ -1,0 +1,28 @@
+[package]
+name = "crank"
+version = "0.1.1"
+edition = "2021"
+authors = ["trucizna"]
+description = "An async-native CLI progress bar and throbber (spinner) library for Rust."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/SuitingRelic392/crank"
+homepage = "https://github.com/SuitingRelic392/crank"
+documentation = "https://docs.rs/crank"
+readme = "README.md"
+keywords = ["progress-bar", "spinner", "throbber", "async", "cli", "terminal"]
+categories = ["command-line-utilities", "async-runtime", "terminal"]
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+crossterm = "0.29"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+tokio-test = "0.4"
+
+[features]
+default = []
+
+[package.metadata.docs.rs]
+all-features = true
+
