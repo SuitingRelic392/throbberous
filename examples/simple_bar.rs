@@ -1,4 +1,4 @@
-use crank::Bar;
+use throbberous::Bar;
 use tokio::time::{sleep, Duration};
 
 #[tokio::main]
@@ -8,6 +8,7 @@ async fn main() {
         sleep(Duration::from_millis(50)).await;
         bar.inc(1).await;
     }
+    println!("");
     bar.finish_with_message("Done!").await;
 }
 

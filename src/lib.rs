@@ -1,17 +1,17 @@
-//! crank
+//! throbberous
 //!
 //! An async-native CLI progress bar and throbber (spinner) library for Rust.
 //!
 //! # Example
 //!
 //! ```rust
-//! use crank::Throbber;
+//! use throbberous::Throbber;
 //! use tokio_test::block_on;
 //!
 //! block_on(async {
 //!     let throbber = Throbber::new("Testing...");
 //!     throbber.start().await;
-//!     // Simulate work here...
+//!     // Simulate work...
 //!     throbber.stop().await;
 //! });
 //! ```
@@ -29,14 +29,12 @@ use tokio::{
     time::sleep,
 };
 
-/// Progress bar configuration
+// --- Progress Bar Implementation ---
+
 #[derive(Clone)]
 pub struct BarConfig {
-    /// Colors to cycle through
     pub colors: Vec<Color>,
-    /// Milliseconds between color changes
     pub color_cycle_delay: u64,
-    /// Width of the progress bar in characters
     pub width: usize,
 }
 
@@ -65,12 +63,10 @@ pub struct Bar {
 }
 
 impl Bar {
-    /// Create a new progress bar with default config
     pub fn new(total: u64) -> Self {
         Self::with_config(total, BarConfig::default())
     }
 
-    /// Create a new progress bar with custom config
     pub fn with_config(total: u64, config: BarConfig) -> Self {
         let state = BarState {
             current: 0,
@@ -82,7 +78,6 @@ impl Bar {
 
         let inner = Arc::new(Mutex::new(state));
         let notify = Arc::new(Notify::new());
-
         let draw_inner = inner.clone();
         let draw_notify = notify.clone();
         let config_clone = config.clone();
@@ -90,18 +85,16 @@ impl Bar {
         task::spawn(async move {
             loop {
                 draw_notify.notified().await;
-
                 let mut state = draw_inner.lock().await;
                 if state.finished {
                     break;
                 }
 
                 Bar::draw(&state, &config_clone);
-                // Cycle color index based on config timing
                 state.color_index = (state.color_index + 1) % config_clone.colors.len();
                 drop(state);
             }
-            // Draw final state
+
             let state = draw_inner.lock().await;
             Bar::draw(&state, &config_clone);
             println!();
@@ -110,7 +103,6 @@ impl Bar {
         Bar { inner, notify, config }
     }
 
-    /// Increment progress by delta
     pub async fn inc(&self, delta: u64) {
         let mut state = self.inner.lock().await;
         if !state.finished {
@@ -123,7 +115,6 @@ impl Bar {
         self.notify.notify_one();
     }
 
-    /// Finish with a custom message
     pub async fn finish_with_message(&self, msg: &str) {
         let mut state = self.inner.lock().await;
         state.current = state.total;
@@ -141,7 +132,6 @@ impl Bar {
         let percent = (progress * 100.0).round();
 
         let color = config.colors.get(state.color_index).unwrap_or(&Color::White);
-
         let mut stdout = std::io::stdout();
         execute!(
             stdout,
@@ -155,14 +145,12 @@ impl Bar {
     }
 }
 
-/// Throbber (spinner) configuration
+// --- Throbber (Spinner) Implementation ---
+
 #[derive(Clone)]
 pub struct ThrobberConfig {
-    /// Frames to cycle through for animation
     pub frames: Vec<&'static str>,
-    /// Colors to cycle through
     pub colors: Vec<Color>,
-    /// Milliseconds between frame changes
     pub frame_delay: u64,
 }
 
@@ -199,12 +187,10 @@ pub struct Throbber {
 }
 
 impl Throbber {
-    /// Create a new Throbber with default config
     pub fn new(msg: impl Into<String>) -> Self {
         Self::with_config(msg, ThrobberConfig::default())
     }
 
-    /// Create a new Throbber with custom config
     pub fn with_config(msg: impl Into<String>, config: ThrobberConfig) -> Self {
         let state = ThrobberState {
             index: 0,
@@ -231,7 +217,7 @@ impl Throbber {
                 drop(state);
                 Throbber::draw(&inner_clone, &config_clone1).await;
             }
-            // Clear line on stop
+
             let mut stdout = std::io::stdout();
             execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
         });
@@ -251,7 +237,7 @@ impl Throbber {
                     state.color_index = (state.color_index + 1) % config_clone2.colors.len();
                 }
                 notify_clone2.notify_one();
-                tokio::time::sleep(Duration::from_millis(config_clone2.frame_delay)).await;
+                sleep(Duration::from_millis(config_clone2.frame_delay)).await;
             }
         });
 
@@ -262,7 +248,6 @@ impl Throbber {
         }
     }
 
-    /// Stop the throbber animation
     pub async fn stop(&self) {
         {
             let mut state = self.inner.lock().await;
@@ -271,7 +256,6 @@ impl Throbber {
         self.notify.notify_one();
     }
 
-    /// Start the throbber (no-op if already running)
     pub async fn start(&self) {
         {
             let mut state = self.inner.lock().await;
