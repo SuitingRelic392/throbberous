@@ -1,4 +1,4 @@
-# crank
+# throbberous
 
 An async-native CLI progress bar and throbber (spinner) library for Rust.
 
@@ -17,5 +17,5 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-crank = "0.1.0"
+throbberous = "0.1.0"
 
