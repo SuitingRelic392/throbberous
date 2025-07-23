@@ -59,7 +59,6 @@ struct BarState {
 pub struct Bar {
     inner: Arc<Mutex<BarState>>,
     notify: Arc<Notify>,
-    config: BarConfig,
 }
 
 impl Bar {
@@ -100,7 +99,7 @@ impl Bar {
             println!();
         });
 
-        Bar { inner, notify, config }
+        Bar { inner, notify }
     }
 
     pub async fn inc(&self, delta: u64) {
@@ -183,7 +182,6 @@ struct ThrobberState {
 pub struct Throbber {
     inner: Arc<Mutex<ThrobberState>>,
     notify: Arc<Notify>,
-    config: ThrobberConfig,
 }
 
 impl Throbber {
@@ -241,11 +239,7 @@ impl Throbber {
             }
         });
 
-        Throbber {
-            inner,
-            notify,
-            config: Arc::try_unwrap(config).unwrap_or_else(|arc| (*arc).clone()),
-        }
+        Throbber { inner, notify }
     }
 
     pub async fn stop(&self) {
@@ -287,4 +281,3 @@ impl Throbber {
         .unwrap();
     }
 }
-
