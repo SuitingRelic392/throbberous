@@ -3,12 +3,16 @@ use tokio::time::{sleep, Duration};
 
 #[tokio::main]
 async fn main() {
+    println!("Simple Progress Bar Demo:");
+    
     let bar = Bar::new(100);
-    for _ in 0..100 {
-        sleep(Duration::from_millis(50)).await;
+    
+    for _i in 0..100 {
         bar.inc(1).await;
+        sleep(Duration::from_millis(50)).await;
+        // Messages automatically change: "Working..." -> "Quarter done" -> "Halfway done" -> "Almost there..." -> "Complete!"
     }
-    println!("");
-    bar.finish_with_message("Done!").await;
+    
+    bar.finish().await;
+    println!("Done!");
 }
-

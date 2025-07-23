@@ -3,27 +3,28 @@ use tokio::time::{sleep, Duration};
 
 #[tokio::main]
 async fn main() {
-    // === Progress Bar Phase ===
-    let total = 50;
-    let bar = Bar::new(total);
-
-    for _ in 0..total {
-        bar.inc(1).await;
-        sleep(Duration::from_millis(50)).await; // simulate work
-    }
-
-    bar.finish_with_message("Completed loading!").await;
-    sleep(Duration::from_millis(500)).await; // pause before throbber
-
-    // === Throbber Phase ===
-    let throbber = Throbber::new("Throbbing...");
+    
+    // Throbber
+    println!("\n1. Throbber");
+    let throbber = Throbber::new();
     throbber.start().await;
-
-    sleep(Duration::from_secs(3)).await; // simulate async task
-
+    sleep(Duration::from_secs(1)).await;
     throbber.stop().await;
-
-   //println!("");
-   //println!("Finished!");
+    
+    // Determinate progress
+    println!("\n2. Progress Bar:");
+    let bar = Bar::new(50);
+    for _i in 0..50 {
+        bar.inc(1).await;
+        sleep(Duration::from_millis(100)).await;
+    }
+    bar.finish().await;
+    
+    // Indeterminate progress
+    println!("\n3. Indeterminate Bar:");
+    let loading = Bar::indeterminate("Working...");
+    sleep(Duration::from_secs(2)).await;
+    loading.finish().await;
+    
+    println!("All demos complete!");
 }
-
