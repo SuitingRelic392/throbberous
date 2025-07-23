@@ -47,7 +47,7 @@ use tokio::{
 
 #[derive(Clone)]
 pub struct BarConfig {
-    pub colors: Vec<Color>,
+    pub colors: Option<Vec<Color>>, // None = no colors
     pub color_cycle_delay: u64,
     pub width: usize,
 }
@@ -55,7 +55,18 @@ pub struct BarConfig {
 impl Default for BarConfig {
     fn default() -> Self {
         Self {
-            colors: vec![Color::Green, Color::Yellow, Color::Magenta, Color::Cyan],
+            colors: Some(vec![Color::Green, Color::Yellow, Color::Magenta, Color::Cyan]),
+            color_cycle_delay: 600,
+            width: 40,
+        }
+    }
+}
+
+impl BarConfig {
+    /// Create a config with no colors (plain text only)
+    pub fn no_colors() -> Self {
+        Self {
+            colors: None,
             color_cycle_delay: 600,
             width: 40,
         }
@@ -88,6 +99,11 @@ impl Bar {
         Self::with_config(total, BarConfig::default())
     }
 
+    /// Creates a new determinate progress bar with no colors
+    pub fn new_plain(total: u64) -> Self {
+        Self::with_config(total, BarConfig::no_colors())
+    }
+
     /// Creates a new determinate progress bar with custom configuration
     pub fn with_config(total: u64, config: BarConfig) -> Self {
         let state = BarState {
@@ -113,6 +129,11 @@ impl Bar {
     /// Creates an indeterminate progress bar for unknown duration tasks
     pub fn indeterminate(message: impl Into<String>) -> Self {
         Self::indeterminate_with_config(message, BarConfig::default())
+    }
+
+    /// Creates an indeterminate progress bar with no colors
+    pub fn indeterminate_plain(message: impl Into<String>) -> Self {
+        Self::indeterminate_with_config(message, BarConfig::no_colors())
     }
 
     /// Creates an indeterminate progress bar with custom configuration
@@ -157,7 +178,13 @@ impl Bar {
                 }
 
                 Self::draw_bar(&state, &config, &mut stdout);
-                state.color_index = (state.color_index + 1) % config.colors.len();
+                
+                // Only cycle colors if colors are enabled
+                if let Some(ref colors) = config.colors {
+                    if !colors.is_empty() {
+                        state.color_index = (state.color_index + 1) % colors.len();
+                    }
+                }
             }
         })
     }
@@ -305,8 +332,6 @@ impl Bar {
     }
 
     fn draw_bar(state: &BarState, config: &BarConfig, stdout: &mut io::Stdout) {
-        let color = config.colors.get(state.color_index).unwrap_or(&Color::White);
-        
         let display = match state.mode {
             BarMode::Determinate { current, total } => {
                 let progress = if total == 0 { 1.0 } else { (current as f64 / total as f64).min(1.0) };
@@ -338,14 +363,26 @@ impl Bar {
             }
         };
 
-        let _ = execute!(
-            stdout,
-            MoveToColumn(0),
-            Clear(ClearType::CurrentLine),
-            SetForegroundColor(*color),
-            Print(display),
-            ResetColor,
-        );
+        // Handle colors - if None, just print without colors
+        if let Some(ref colors) = config.colors {
+            let color = colors.get(state.color_index).unwrap_or(&Color::White);
+            let _ = execute!(
+                stdout,
+                MoveToColumn(0),
+                Clear(ClearType::CurrentLine),
+                SetForegroundColor(*color),
+                Print(&display),
+                ResetColor,
+            );
+        } else {
+            // No colors - just plain text
+            let _ = execute!(
+                stdout,
+                MoveToColumn(0),
+                Clear(ClearType::CurrentLine),
+                Print(&display),
+            );
+        }
     }
 }
 
@@ -354,7 +391,7 @@ impl Bar {
 #[derive(Clone)]
 pub struct ThrobberConfig {
     pub frames: Vec<&'static str>,
-    pub colors: Vec<Color>,
+    pub colors: Option<Vec<Color>>, // None = no colors
     pub frame_delay: u64,
 }
 
@@ -362,10 +399,21 @@ impl Default for ThrobberConfig {
     fn default() -> Self {
         Self {
             frames: vec!["|", "/", "-", "\\"],
-            colors: vec![
+            colors: Some(vec![
                 Color::Green, Color::Yellow, Color::Magenta, Color::Cyan,
                 Color::Blue, Color::Red, Color::White, Color::DarkGrey,
-            ],
+            ]),
+            frame_delay: 150,
+        }
+    }
+}
+
+impl ThrobberConfig {
+    /// Create a config with no colors (plain text only)
+    pub fn no_colors() -> Self {
+        Self {
+            frames: vec!["|", "/", "-", "\\"],
+            colors: None,
             frame_delay: 150,
         }
     }
@@ -387,6 +435,11 @@ pub struct Throbber {
 impl Throbber {
     pub fn new() -> Self {
         Self::with_config(ThrobberConfig::default())
+    }
+
+    /// Create a new throbber with no colors
+    pub fn new_plain() -> Self {
+        Self::with_config(ThrobberConfig::no_colors())
     }
 
     pub fn with_config(config: ThrobberConfig) -> Self {
@@ -447,7 +500,13 @@ impl Throbber {
                         false
                     } else {
                         state.frame_index = (state.frame_index + 1) % config.frames.len();
-                        state.color_index = (state.color_index + 1) % config.colors.len();
+                        
+                        // Only cycle colors if colors are enabled
+                        if let Some(ref colors) = config.colors {
+                            if !colors.is_empty() {
+                                state.color_index = (state.color_index + 1) % colors.len();
+                            }
+                        }
                         true
                     }
                 };
@@ -489,15 +548,27 @@ impl Throbber {
 
     fn draw_frame(state: &ThrobberState, config: &ThrobberConfig, stdout: &mut io::Stdout) {
         let frame = config.frames[state.frame_index];
-        let color = config.colors.get(state.color_index).unwrap_or(&Color::White);
+        let display = format!("{} {}", frame, state.message);
 
-        let _ = execute!(
-            stdout,
-            MoveToColumn(0),
-            Clear(ClearType::CurrentLine),
-            SetForegroundColor(*color),
-            Print(format!("{} {}", frame, state.message)),
-            ResetColor,
-        );
+        // Handle colors - if None, just print without colors
+        if let Some(ref colors) = config.colors {
+            let color = colors.get(state.color_index).unwrap_or(&Color::White);
+            let _ = execute!(
+                stdout,
+                MoveToColumn(0),
+                Clear(ClearType::CurrentLine),
+                SetForegroundColor(*color),
+                Print(&display),
+                ResetColor,
+            );
+        } else {
+            // No colors - just plain text
+            let _ = execute!(
+                stdout,
+                MoveToColumn(0),
+                Clear(ClearType::CurrentLine),
+                Print(&display),
+            );
+        }
     }
 }

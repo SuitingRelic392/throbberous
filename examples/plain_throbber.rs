@@ -5,7 +5,7 @@ use tokio::time::{sleep, Duration};
 async fn main() {
     println!("Throbber");
     
-    let throbber = Throbber::new();
+    let throbber = Throbber::new_plain();
     throbber.start().await;
     // Spins: | / - \ with "Working..."
     sleep(Duration::from_secs(5)).await;
