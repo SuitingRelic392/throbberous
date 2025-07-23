@@ -3,11 +3,11 @@ use tokio::time::{sleep, Duration};
 
 #[tokio::main]
 async fn main() {
-    println!("Indeterminate Progress Bar Demo:");
+    println!("Indeterminate Progress Bar:");
     
     let loading = Bar::indeterminate("Working...");
     // Shows bouncing animation: [    ====    ]
-    sleep(Duration::from_secs(3)).await;
+    sleep(Duration::from_secs(7)).await;
     loading.finish().await;
     println!("Done!");
 }

@@ -8,7 +8,7 @@ async fn main() {
     println!("\n1. Throbber");
     let throbber = Throbber::new();
     throbber.start().await;
-    sleep(Duration::from_secs(1)).await;
+    sleep(Duration::from_secs(5)).await;
     throbber.stop().await;
     
     // Determinate progress
@@ -23,7 +23,7 @@ async fn main() {
     // Indeterminate progress
     println!("\n3. Indeterminate Bar:");
     let loading = Bar::indeterminate("Working...");
-    sleep(Duration::from_secs(2)).await;
+    sleep(Duration::from_secs(6)).await;
     loading.finish().await;
     
     println!("All demos complete!");

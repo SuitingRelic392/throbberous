@@ -1,6 +1,6 @@
 [package]
 name = "throbberous"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["trucizna"]
 description = "An async-native CLI progress bar and throbber (spinner) library for Rust."

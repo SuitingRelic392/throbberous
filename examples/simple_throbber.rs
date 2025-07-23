@@ -5,9 +5,9 @@ use tokio::time::{sleep, Duration};
 async fn main() {
     println!("Throbber");
     
-    let throbber = Throbber::new("Throbbing...");
+    let throbber = Throbber::new();
     throbber.start().await;
     // Spins: | / - \ with "Working..."
-    sleep(Duration::from_secs(5)).await;
+    sleep(Duration::from_secs(7)).await;
     throbber.stop().await;
 }
