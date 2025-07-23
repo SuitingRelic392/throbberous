@@ -23,7 +23,7 @@ async fn main() {
 
     throbber.stop().await;
 
-    println!("");
-    println!("Finished!");
+   //println!("");
+   //println!("Finished!");
 }
 

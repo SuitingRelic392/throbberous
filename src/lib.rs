@@ -252,6 +252,8 @@ impl Throbber {
         {
             let mut state = self.inner.lock().await;
             state.running = false;
+            println!("");
+            println!("Finished");
         }
         self.notify.notify_one();
     }
