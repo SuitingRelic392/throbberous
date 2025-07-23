@@ -394,7 +394,7 @@ impl Throbber {
             frame_index: 0,
             color_index: 0,
             running: false,
-            message: "Working...".to_string(),
+            message: "Throbbing...".to_string(),
         };
 
         let inner = Arc::new(Mutex::new(state));
